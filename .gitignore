@@ -1,0 +1,70 @@
+# ===== ビルド成果物 =====
+build/
+out/
+bin/
+lib/
+x64/
+x86/
+Debug/
+Release/
+RelWithDebInfo/
+MinSizeRel/
+
+# ライブラリファイル
+*.lib
+*.dll
+*.exe
+*.pdb
+*.ilk
+*.exp
+
+# オブジェクトファイル
+*.obj
+*.o
+
+# ===== Visual Studio =====
+.vs/
+*.user
+*.suo
+*.sdf
+*.opensdf
+*.opendb
+*.VC.db
+*.VC.VC.opendb
+*.vcxproj.user
+*.vcxproj.filters
+
+# ===== CMake =====
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+!cmake/*.cmake
+
+# ===== コンパイル済みシェーダー =====
+*.cso
+*.dxc
+
+# ===== ログ・デバッグ =====
+*.log
+*.dmp
+
+# ===== OS固有 =====
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ===== IDE =====
+.vscode/
+.idea/
+
+# ===== 一時ファイル =====
+*~
+*.swp
+*.tmp
+
+# ===== テスト結果 =====
+Testing/
+test_results/
