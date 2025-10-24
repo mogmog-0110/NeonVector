@@ -13,6 +13,9 @@
 // Math
 #include "Math/Vector2.h"
 
+// Graphics
+#include "Graphics/LineBatcher.h"
+
 /**
  * @namespace NeonVector
  * @brief NeonVector Engine の全機能を含む名前空間
@@ -34,6 +37,19 @@ namespace NeonVector
             return "0.1.0";
         }
     };
+
+    namespace Simple
+    {
+        bool Init(int width, int height, const char *title);
+        bool Update();
+        void Shutdown();
+        void ClearScreen(const Color &color = Color::Black);
+
+        // 新しい描画関数
+        void DrawLine(const Vector2 &start, const Vector2 &end,
+                      const Color &color, float thickness = 1.0f);
+        void FlushLines();
+    }
 
 } // namespace NeonVector
 

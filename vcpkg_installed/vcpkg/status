@@ -1,0 +1,23 @@
+Package: vcpkg-cmake-config
+Version: 2024-05-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 11cb5ac60acb47e1f0b5809e61a9656bf1d4a2ea2cf612b9f41b5c22c6d29bab
+Status: install ok installed
+
+Package: vcpkg-cmake
+Version: 2024-04-23
+Architecture: x64-windows
+Multi-Arch: same
+Abi: 499a2a8ff5294e97c07261644cdce7864a546ffc7c6f191e263093981fac9dfb
+Status: install ok installed
+
+Package: directx-headers
+Version: 1.616.0
+Depends: vcpkg-cmake, vcpkg-cmake-config
+Architecture: x64-windows
+Multi-Arch: same
+Abi: ab57616b9972aecdd89b7c105923136335c66309020be9a746a17bae4e2f184d
+Description: Official DirectX 12 Headers
+Status: install ok installed
+

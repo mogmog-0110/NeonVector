@@ -1,0 +1,6 @@
+{
+  "name": "neonvector",
+  "dependencies": [
+    "directx-headers"
+  ]
+}

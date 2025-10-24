@@ -1,35 +1,29 @@
+# src/CMakeLists.txt
+
+find_package(directx-headers CONFIG REQUIRED)
+
 # ソースファイルを収集
-set(NEONVECTOR_SOURCES
-    # Core
-    Core/Application.cpp
-    Core/DX12Context.cpp
-    
-    # Math (実装が必要な場合のみ)
-    # Math/Vector2.cpp
-    
-    # Graphics (将来追加)
-    # Graphics/LineBatcher.cpp
-    # Graphics/Renderer.cpp
+file(GLOB_RECURSE NEONVECTOR_HEADERS 
+    "${CMAKE_SOURCE_DIR}/include/NeonVector/*.h"
 )
 
-# ヘッダーファイルを収集
-set(NEONVECTOR_HEADERS
-    ${CMAKE_SOURCE_DIR}/include/NeonVector/NeonVector.h
-    ${CMAKE_SOURCE_DIR}/include/NeonVector/Core/Application.h
-    ${CMAKE_SOURCE_DIR}/include/NeonVector/Core/Types.h
-    ${CMAKE_SOURCE_DIR}/include/NeonVector/Math/Vector2.h
+file(GLOB_RECURSE NEONVECTOR_SOURCES
+    "Core/*.cpp"
+    "Graphics/*.cpp"
+    # "Math/*.cpp"
+    # "Effects/*.cpp"
+    # "3D/*.cpp"
 )
 
-# 内部ヘッダー
-set(NEONVECTOR_PRIVATE_HEADERS
-    DX12Context.h
+# シェーダーファイル
+file(GLOB NEONVECTOR_SHADERS
+    "${CMAKE_SOURCE_DIR}/shaders/*.hlsl"
 )
 
 # 静的ライブラリとして作成
 add_library(NeonVector STATIC
-    ${NEONVECTOR_SOURCES}
     ${NEONVECTOR_HEADERS}
-    ${NEONVECTOR_PRIVATE_HEADERS}
+    ${NEONVECTOR_SOURCES}
 )
 
 # インクルードディレクトリ
@@ -46,10 +40,51 @@ target_link_libraries(NeonVector
     PUBLIC
         d3d12.lib
         dxgi.lib
-        d3dcompiler.lib
+        d3dcompiler.lib    # シェーダーコンパイル用
+        Microsoft::DirectX-Headers
 )
 
-# プリコンパイル済みヘッダー（オプション、後で追加可能）
-# target_precompile_headers(NeonVector PRIVATE pch.h)
+set(COMPILED_SHADERS "")
 
-message(STATUS "NeonVector library configured")
+foreach(SHADER ${NEONVECTOR_SHADERS})
+    get_filename_component(SHADER_NAME ${SHADER} NAME_WE)
+    
+    # 頂点シェーダー
+    set(VS_OUTPUT "${CMAKE_BINARY_DIR}/shaders/${SHADER_NAME}_VS.cso")
+    add_custom_command(
+        OUTPUT ${VS_OUTPUT}
+        COMMAND ${CMAKE_COMMAND} -E make_directory "${CMAKE_BINARY_DIR}/shaders"
+        COMMAND fxc /T vs_5_1 /E VSMain /Fo "${VS_OUTPUT}" "${SHADER}"
+        DEPENDS ${SHADER}
+        COMMENT "Compiling vertex shader: ${SHADER_NAME}"
+        VERBATIM
+    )
+    list(APPEND COMPILED_SHADERS ${VS_OUTPUT})
+    
+    # ピクセルシェーダー
+    set(PS_OUTPUT "${CMAKE_BINARY_DIR}/shaders/${SHADER_NAME}_PS.cso")
+    add_custom_command(
+        OUTPUT ${PS_OUTPUT}
+        COMMAND fxc /T ps_5_1 /E PSMain /Fo "${PS_OUTPUT}" "${SHADER}"
+        DEPENDS ${SHADER}
+        COMMENT "Compiling pixel shader: ${SHADER_NAME}"
+        VERBATIM
+    )
+    list(APPEND COMPILED_SHADERS ${PS_OUTPUT})
+endforeach()
+
+# シェーダーコンパイルターゲット
+add_custom_target(NeonVectorShaders ALL DEPENDS ${COMPILED_SHADERS})
+add_dependencies(NeonVector NeonVectorShaders)
+
+# 実行時にシェーダーをコピー
+foreach(CONFIG ${CMAKE_CONFIGURATION_TYPES})
+    add_custom_command(TARGET NeonVector POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory 
+            "${CMAKE_BINARY_DIR}/bin/${CONFIG}/shaders"
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+            "${CMAKE_BINARY_DIR}/shaders"
+            "${CMAKE_BINARY_DIR}/bin/${CONFIG}/shaders"
+        COMMENT "Copying shaders to output directory (${CONFIG})"
+    )
+endforeach()

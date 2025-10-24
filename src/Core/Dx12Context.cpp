@@ -1,5 +1,5 @@
 #include "../DX12Context.h"
-#include "../../thirdparty/d3dx12.h"
+#include <directx/d3dx12.h>
 #include <iostream>
 #include <stdexcept>
 
@@ -32,32 +32,48 @@ namespace NeonVector
 
     bool DX12Context::Initialize(HWND hwnd, int width, int height)
     {
-        m_hwnd = hwnd;
         m_width = width;
         m_height = height;
 
-        try
+        if (!CreateDevice())
         {
-            if (!CreateDevice())
-                return false;
-            if (!CreateCommandObjects())
-                return false;
-            if (!CreateSwapChain(hwnd, width, height))
-                return false;
-            if (!CreateRenderTargets())
-                return false;
-            if (!CreateFence())
-                return false;
-
-            m_isInitialized = true;
-            std::cout << "DirectX12 initialized successfully" << std::endl;
-            return true;
-        }
-        catch (const std::exception &e)
-        {
-            std::cerr << "DX12 Initialization failed: " << e.what() << std::endl;
+            std::cerr << "Failed to create device" << std::endl;
             return false;
         }
+
+        if (!CreateCommandObjects())
+        {
+            std::cerr << "Failed to create command objects" << std::endl;
+            return false;
+        }
+
+        if (!CreateSwapChain(hwnd, width, height))
+        {
+            std::cerr << "Failed to create swap chain" << std::endl;
+            return false;
+        }
+
+        if (!CreateRenderTargets())
+        {
+            std::cerr << "Failed to create render targets" << std::endl;
+            return false;
+        }
+
+        if (!CreateFence())
+        {
+            std::cerr << "Failed to create fence" << std::endl;
+            return false;
+        }
+
+        m_lineBatcher = std::make_unique<Graphics::LineBatcher>();
+        if (!m_lineBatcher->Initialize(m_device.Get(), m_commandList.Get(), m_width, m_height))
+        {
+            std::cerr << "Failed to initialize LineBatcher" << std::endl;
+            return false;
+        }
+
+        std::cout << "DX12Context: All systems initialized successfully" << std::endl;
+        return true;
     }
 
     void DX12Context::Shutdown()
@@ -66,6 +82,12 @@ namespace NeonVector
             return;
 
         WaitForGPU();
+
+        if (m_lineBatcher)
+        {
+            m_lineBatcher->Shutdown();
+            m_lineBatcher.reset();
+        }
 
         if (m_fenceEvent)
         {
@@ -202,18 +224,39 @@ namespace NeonVector
 
     void DX12Context::BeginFrame()
     {
-        ThrowIfFailed(m_commandAllocators[m_currentBackBufferIndex]->Reset());
-        ThrowIfFailed(m_commandList->Reset(m_commandAllocators[m_currentBackBufferIndex].Get(), nullptr));
+        // コマンドアロケーターのリセット
+        m_commandAllocators[m_currentBackBufferIndex]->Reset();
+        m_commandList->Reset(m_commandAllocators[m_currentBackBufferIndex].Get(), nullptr);
 
-        // リソースバリア（Present → RenderTarget）
-        D3D12_RESOURCE_BARRIER barrier = {};
-        barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
-        barrier.Transition.pResource = m_renderTargets[m_currentBackBufferIndex].Get();
-        barrier.Transition.StateBefore = D3D12_RESOURCE_STATE_PRESENT;
-        barrier.Transition.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET;
-        barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
-
+        // リソースバリア: PRESENT → RENDER_TARGET
+        CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+            m_renderTargets[m_currentBackBufferIndex].Get(),
+            D3D12_RESOURCE_STATE_PRESENT,
+            D3D12_RESOURCE_STATE_RENDER_TARGET);
         m_commandList->ResourceBarrier(1, &barrier);
+
+        // レンダーターゲットを設定
+        CD3DX12_CPU_DESCRIPTOR_HANDLE rtvHandle(
+            m_rtvHeap->GetCPUDescriptorHandleForHeapStart(),
+            m_currentBackBufferIndex,
+            m_rtvDescriptorSize);
+        m_commandList->OMSetRenderTargets(1, &rtvHandle, FALSE, nullptr);
+
+        // ビューポートとシザー矩形を設定（これが重要！
+        D3D12_VIEWPORT viewport = {
+            0.0f, 0.0f,                   // TopLeftX, TopLeftY
+            static_cast<float>(m_width),  // Width
+            static_cast<float>(m_height), // Height
+            0.0f, 1.0f                    // MinDepth, MaxDepth
+        };
+        m_commandList->RSSetViewports(1, &viewport);
+
+        D3D12_RECT scissorRect = {
+            0, 0,                       // left, top
+            static_cast<LONG>(m_width), // right
+            static_cast<LONG>(m_height) // bottom
+        };
+        m_commandList->RSSetScissorRects(1, &scissorRect);
     }
 
     void DX12Context::ClearRenderTarget(float r, float g, float b, float a)

@@ -1,8 +1,17 @@
+/**
+ * @file DX12Context.h
+ * @brief DirectX12のコンテキスト管理
+ */
+
 #pragma once
 
 #include <d3d12.h>
 #include <dxgi1_6.h>
 #include <wrl/client.h>
+#include <vector>
+#include <memory>
+
+#include <NeonVector/Graphics/LineBatcher.h>
 
 using Microsoft::WRL::ComPtr;
 
@@ -27,6 +36,8 @@ namespace NeonVector
         void Present(bool vsync);
 
         void ClearRenderTarget(float r, float g, float b, float a);
+
+        Graphics::LineBatcher *GetLineBatcher() { return m_lineBatcher.get(); }
 
     private:
         bool CreateDevice();
@@ -59,6 +70,8 @@ namespace NeonVector
         HWND m_hwnd;
         int m_width, m_height;
         bool m_isInitialized;
+
+        std::unique_ptr<Graphics::LineBatcher> m_lineBatcher;
     };
 
 } // namespace NeonVector

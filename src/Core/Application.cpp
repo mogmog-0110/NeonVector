@@ -5,7 +5,6 @@
 
 namespace NeonVector
 {
-
     Application::Application(const ApplicationConfig &config)
         : m_config(config), m_hwnd(nullptr), m_isRunning(false), m_context(nullptr)
     {
@@ -118,6 +117,14 @@ namespace NeonVector
             TranslateMessage(&msg);
             DispatchMessageW(&msg);
         }
+    }
+
+    Graphics::LineBatcher* Application::GetLineBatcher() const
+    {
+        if (m_context) {
+            return m_context->GetLineBatcher();
+        }
+        return nullptr;
     }
 
     LRESULT CALLBACK Application::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)

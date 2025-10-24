@@ -10,6 +10,11 @@ namespace NeonVector
     // 前方宣言
     class DX12Context;
 
+
+    namespace Graphics {
+        class LineBatcher; 
+    }
+
     /**
      * @struct ApplicationConfig
      * @brief アプリケーション設定
@@ -70,6 +75,8 @@ namespace NeonVector
          * @brief 終了時に呼ばれる
          */
         virtual void OnShutdown() {}
+
+        Graphics::LineBatcher* GetLineBatcher() const;
 
     protected:
         ApplicationConfig m_config;
