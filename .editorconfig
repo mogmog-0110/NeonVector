@@ -1,0 +1,29 @@
+# .editorconfig
+root = true
+
+# すべてのファイル
+[*]
+charset = utf-8-bom
+end_of_line = crlf
+insert_final_newline = true
+trim_trailing_whitespace = true
+
+# C/C++ファイル
+[*.{c,cpp,h,hpp}]
+charset = utf-8-bom
+indent_style = space
+indent_size = 4
+
+# CMakeファイル
+[CMakeLists.txt]
+indent_style = space
+indent_size = 4
+
+# PowerShellスクリプト
+[*.ps1]
+charset = utf-8-bom
+
+# バッチファイル
+[*.bat]
+charset = utf-8
+end_of_line = crlf
