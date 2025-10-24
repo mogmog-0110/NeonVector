@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file DX12Context.h
  * @brief DirectX12のコンテキスト管理
  */
