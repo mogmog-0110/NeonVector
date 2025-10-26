@@ -170,6 +170,10 @@ namespace NeonVector {
             ComPtr<ID3D12Resource> m_bloomParamsBuffer;
             ComPtr<ID3D12Resource> m_blurParamsBuffer;
 
+            // デスクリプタヒープ（RenderTarget用）
+            ComPtr<ID3D12DescriptorHeap> m_rtvHeap;
+            ComPtr<ID3D12DescriptorHeap> m_srvHeap;
+
             // フルスクリーンクワッド
             std::unique_ptr<Graphics::FullscreenQuad> m_fullscreenQuad;
 

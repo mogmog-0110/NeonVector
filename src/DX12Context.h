@@ -12,6 +12,7 @@
 #include <memory>
 
 #include <NeonVector/Graphics/LineBatcher.h>
+#include <NeonVector/Graphics/RenderTarget.h>
 
 using Microsoft::WRL::ComPtr;
 
@@ -38,6 +39,9 @@ namespace NeonVector
         void ClearRenderTarget(float r, float g, float b, float a);
 
         Graphics::LineBatcher *GetLineBatcher() { return m_lineBatcher.get(); }
+        ID3D12Device* GetDevice() { return m_device.Get(); }
+        ID3D12GraphicsCommandList* GetCommandList() { return m_commandList.Get(); }
+        Graphics::RenderTarget* GetCurrentRenderTarget();
 
     private:
         bool CreateDevice();
@@ -71,7 +75,13 @@ namespace NeonVector
         int m_width, m_height;
         bool m_isInitialized;
 
+        ComPtr<ID3D12DescriptorHeap> m_postProcessRtvHeap;
+        ComPtr<ID3D12DescriptorHeap> m_postProcessSrvHeap;
+        UINT m_postProcessRtvDescriptorSize;
+        UINT m_postProcessSrvDescriptorSize;
+
         std::unique_ptr<Graphics::LineBatcher> m_lineBatcher;
+        std::unique_ptr<Graphics::RenderTarget> m_currentRenderTarget;
     };
 
 } // namespace NeonVector

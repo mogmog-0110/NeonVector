@@ -144,12 +144,23 @@ namespace NeonVector {
                 return;
             }
 
+            if (m_currentState != stateBefore) {
+                // 警告ログ（デバッグ用）
+#ifdef _DEBUG
+                OutputDebugStringA("Warning: Resource state mismatch in TransitionTo\n");
+#endif
+                // 実際の現在の状態から遷移
+                stateBefore = m_currentState;
+            }
+
             // リソースバリアを設定
-            D3D12_RESOURCE_BARRIER barrier = ResourceBarrierTransition(
-                m_resource.Get(),
-                stateBefore,
-                stateAfter
-            );
+            D3D12_RESOURCE_BARRIER barrier = {};
+            barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;
+            barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+            barrier.Transition.pResource = m_resource.Get();
+            barrier.Transition.StateBefore = stateBefore;
+            barrier.Transition.StateAfter = stateAfter;
+            barrier.Transition.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES;
 
             commandList->ResourceBarrier(1, &barrier);
 

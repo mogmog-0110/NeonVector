@@ -3,6 +3,7 @@
 #include <string>
 #include <memory>
 #include <Windows.h>
+#include <d3d12.h>
 
 namespace NeonVector
 {
@@ -12,7 +13,8 @@ namespace NeonVector
 
 
     namespace Graphics {
-        class LineBatcher; 
+        class LineBatcher;
+        class RenderTarget;
     }
 
     /**
@@ -77,6 +79,21 @@ namespace NeonVector
         virtual void OnShutdown() {}
 
         Graphics::LineBatcher* GetLineBatcher() const;
+
+        /**
+         * @brief D3D12デバイスを取得
+         */
+        ID3D12Device* GetDevice() const;
+
+        /**
+         * @brief コマンドリストを取得
+         */
+        ID3D12GraphicsCommandList* GetCommandList() const;
+
+        /**
+         * @brief 現在のレンダーターゲットを取得
+         */
+        Graphics::RenderTarget* GetCurrentRenderTarget() const;
 
     protected:
         ApplicationConfig m_config;

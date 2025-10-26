@@ -127,6 +127,30 @@ namespace NeonVector
         return nullptr;
     }
 
+    ID3D12Device* Application::GetDevice() const
+    {
+        if (m_context) {
+            return m_context->GetDevice();
+        }
+        return nullptr;
+    }
+
+    ID3D12GraphicsCommandList* Application::GetCommandList() const
+    {
+        if (m_context) {
+            return m_context->GetCommandList();
+        }
+        return nullptr;
+    }
+
+    Graphics::RenderTarget* Application::GetCurrentRenderTarget() const
+    {
+        if (m_context) {
+            return m_context->GetCurrentRenderTarget();
+        }
+        return nullptr;
+    }
+
     LRESULT CALLBACK Application::WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam)
     {
         Application *app = nullptr;

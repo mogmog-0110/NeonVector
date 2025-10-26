@@ -95,6 +95,10 @@ namespace NeonVector
             m_fenceEvent = nullptr;
         }
 
+        m_currentRenderTarget.reset();
+        m_postProcessRtvHeap.Reset();
+        m_postProcessSrvHeap.Reset();
+
         m_isInitialized = false;
         std::cout << "DirectX12 shutdown complete" << std::endl;
     }
@@ -321,6 +325,97 @@ namespace NeonVector
         }
 
         m_fenceValues[m_currentBackBufferIndex] = currentFenceValue + 1;
+    }
+
+    Graphics::RenderTarget* DX12Context::GetCurrentRenderTarget()
+    {
+        if (!m_currentRenderTarget)
+        {
+            // ディスクリプタヒープの作成
+            if (!m_postProcessRtvHeap)
+            {
+                D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
+                rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
+                rtvHeapDesc.NumDescriptors = 4;  // 複数のRTに対応
+                rtvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+                rtvHeapDesc.NodeMask = 0;
+
+                HRESULT hr = m_device->CreateDescriptorHeap(&rtvHeapDesc, IID_PPV_ARGS(&m_postProcessRtvHeap));
+                if (FAILED(hr)) {
+                    return nullptr;
+                }
+
+                m_postProcessRtvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+            }
+
+            if (!m_postProcessSrvHeap)
+            {
+                D3D12_DESCRIPTOR_HEAP_DESC srvHeapDesc = {};
+                srvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
+                srvHeapDesc.NumDescriptors = 4;
+                srvHeapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+                srvHeapDesc.NodeMask = 0;
+
+                HRESULT hr = m_device->CreateDescriptorHeap(&srvHeapDesc, IID_PPV_ARGS(&m_postProcessSrvHeap));
+                if (FAILED(hr)) {
+                    return nullptr;
+                }
+
+                m_postProcessSrvDescriptorSize = m_device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+            }
+
+            // RenderTargetの作成
+            m_currentRenderTarget = std::make_unique<Graphics::RenderTarget>();
+
+            float clearColor[4] = { 0.0f, 0.0f, 0.0f, 1.0f };
+            if (!m_currentRenderTarget->Initialize(
+                m_device.Get(),
+                m_width,
+                m_height,
+                DXGI_FORMAT_R8G8B8A8_UNORM,
+                clearColor))
+            {
+                m_currentRenderTarget.reset();
+                return nullptr;
+            }
+
+            // RTVハンドルの設定
+            D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = m_postProcessRtvHeap->GetCPUDescriptorHandleForHeapStart();
+
+            D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+            rtvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+            rtvDesc.Texture2D.MipSlice = 0;
+
+            m_device->CreateRenderTargetView(
+                m_currentRenderTarget->GetResource(),
+                &rtvDesc,
+                rtvHandle
+            );
+
+            m_currentRenderTarget->SetRTVHandle(rtvHandle);
+
+            // SRVハンドルの設定
+            D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = m_postProcessSrvHeap->GetCPUDescriptorHandleForHeapStart();
+            D3D12_GPU_DESCRIPTOR_HANDLE srvGpuHandle = m_postProcessSrvHeap->GetGPUDescriptorHandleForHeapStart();
+
+            D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+            srvDesc.Format = DXGI_FORMAT_R8G8B8A8_UNORM;
+            srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+            srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+            srvDesc.Texture2D.MipLevels = 1;
+            srvDesc.Texture2D.MostDetailedMip = 0;
+
+            m_device->CreateShaderResourceView(
+                m_currentRenderTarget->GetResource(),
+                &srvDesc,
+                srvCpuHandle
+            );
+
+            m_currentRenderTarget->SetSRVHandle(srvCpuHandle, srvGpuHandle);
+        }
+
+        return m_currentRenderTarget.get();
     }
 
 } // namespace NeonVector
