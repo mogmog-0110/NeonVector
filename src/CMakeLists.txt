@@ -180,28 +180,6 @@ if(EXISTS ${BLOOM_SHADER})
         VERBATIM
     )
     list(APPEND COMPILED_SHADERS ${PS_COPY_OUTPUT})
-    
-    # ダウンサンプリング
-    set(PS_DOWNSAMPLE_OUTPUT "${CMAKE_BINARY_DIR}/shaders/Bloom_PSDownsample.cso")
-    add_custom_command(
-        OUTPUT ${PS_DOWNSAMPLE_OUTPUT}
-        COMMAND fxc /T ps_5_1 /E PSDownsample /Fo "${PS_DOWNSAMPLE_OUTPUT}" "${BLOOM_SHADER}"
-        DEPENDS ${BLOOM_SHADER}
-        COMMENT "Compiling Bloom downsample shader"
-        VERBATIM
-    )
-    list(APPEND COMPILED_SHADERS ${PS_DOWNSAMPLE_OUTPUT})
-    
-    # アップサンプリング
-    set(PS_UPSAMPLE_OUTPUT "${CMAKE_BINARY_DIR}/shaders/Bloom_PSUpsample.cso")
-    add_custom_command(
-        OUTPUT ${PS_UPSAMPLE_OUTPUT}
-        COMMAND fxc /T ps_5_1 /E PSUpsample /Fo "${PS_UPSAMPLE_OUTPUT}" "${BLOOM_SHADER}"
-        DEPENDS ${BLOOM_SHADER}
-        COMMENT "Compiling Bloom upsample shader"
-        VERBATIM
-    )
-    list(APPEND COMPILED_SHADERS ${PS_UPSAMPLE_OUTPUT})
 endif()
 
 # シェーダーコンパイルターゲット

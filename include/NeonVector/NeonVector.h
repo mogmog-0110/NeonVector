@@ -38,19 +38,6 @@ namespace NeonVector
         }
     };
 
-    namespace Simple
-    {
-        bool Init(int width, int height, const char *title);
-        bool Update();
-        void Shutdown();
-        void ClearScreen(const Color &color = Color::Black);
-
-        // 新しい描画関数
-        void DrawLine(const Vector2 &start, const Vector2 &end,
-                      const Color &color, float thickness = 1.0f);
-        void FlushLines();
-    }
-
 } // namespace NeonVector
 
 // エイリアス（短く書けるように）

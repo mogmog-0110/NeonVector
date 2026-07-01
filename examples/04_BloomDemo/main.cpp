@@ -7,7 +7,6 @@
 #include <NeonVector/Math/Vector2.h>
 
 #include <NeonVector/Effects/BloomEffect.h>
-#include <NeonVector/Graphics/PostProcessManager.h>
 
 #include <cmath>
 #include <memory>
@@ -21,7 +20,6 @@ private:
     float m_rotation = 0.0f;
     float m_time = 0.0f;
 
-    std::unique_ptr<Graphics::PostProcessManager> m_postProcessManager;
     std::unique_ptr<Effects::BloomEffect> m_bloomEffect;
     bool m_bloomEnabled = true;
 
@@ -40,17 +38,6 @@ public:
     {
         // 親クラスの初期化
         Application::OnInit();
-
-        // PostProcessManagerの初期化
-        m_postProcessManager = std::make_unique<Graphics::PostProcessManager>();
-        if (!m_postProcessManager->Initialize(
-            GetDevice(),
-            m_config.width,
-            m_config.height))
-        {
-            std::cerr << "Failed to initialize PostProcessManager" << std::endl;
-            m_postProcessManager.reset();  // 初期化失敗時はリセット
-        }
 
         // BloomEffectの初期化
         m_bloomEffect = std::make_unique<Effects::BloomEffect>();

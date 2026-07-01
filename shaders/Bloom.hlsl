@@ -103,36 +103,3 @@ float4 PSCopy(PSInput input) : SV_TARGET
 {
     return sceneTexture.Sample(samplerLinear, input.uv);
 }
-
-// ========================================
-// ダウンサンプリング/アップサンプリング
-// ========================================
-
-// ダウンサンプリング（4x4領域の平均を取る）
-float4 PSDownsample(PSInput input) : SV_TARGET
-{
-    // テクセルサイズ
-    float2 texelSize = float2(1.0 / 1920.0, 1.0 / 1080.0);  // TODO: 動的に設定
-    
-    // 4x4領域をサンプリング
-    float4 result = float4(0, 0, 0, 0);
-    
-    for (int x = -1; x <= 1; x++)
-    {
-        for (int y = -1; y <= 1; y++)
-        {
-            float2 offset = float2(x, y) * texelSize;
-            result += sceneTexture.Sample(samplerLinear, input.uv + offset);
-        }
-    }
-    
-    // 平均を取る（9サンプル）
-    return result / 9.0;
-}
-
-// アップサンプリング（バイリニア補間）
-float4 PSUpsample(PSInput input) : SV_TARGET
-{
-    // GPUのバイリニア補間を利用
-    return sceneTexture.Sample(samplerLinear, input.uv);
-}
