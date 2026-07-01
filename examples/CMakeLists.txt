@@ -3,5 +3,6 @@ add_subdirectory(02_LineDrawing)
 add_subdirectory(03_BasicShapes)
 add_subdirectory(04_BloomDemo)
 add_subdirectory(05_NeonPlayground)
+add_subdirectory(06_Asteroids)
 
 message(STATUS "Examples configured")

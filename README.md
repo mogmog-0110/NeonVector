@@ -45,6 +45,7 @@ cmake --build build --config Debug
 | `03_BasicShapes`   | 円・多角形などの図形 |
 | `04_BloomDemo`     | 放射線＋脈動する円＋六角形を bloom で発光（Space で bloom ON/OFF） |
 | `05_NeonPlayground`| 拡張プリミティブ＋マウス追従コメット＋クリックで発光パーティクル（1-4 色切替 / Space バースト） |
+| `06_Asteroids`     | **遊べるネオン Asteroids**。自機・分裂する小惑星・射撃・当たり判定・爆発・残機・ウェーブ・スコア。←→旋回 / ↑推進 / Space 射撃 / R リスタート |
 
 ## 使い方（最小コード）
 
