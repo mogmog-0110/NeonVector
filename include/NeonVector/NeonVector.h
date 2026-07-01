@@ -15,6 +15,11 @@
 
 // Graphics
 #include "Graphics/LineBatcher.h"
+#include "Graphics/Primitives.h"
+
+// Effects
+#include "Effects/Trail.h"
+#include "Effects/ParticleSystem.h"
 
 /**
  * @namespace NeonVector
