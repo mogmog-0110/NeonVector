@@ -68,8 +68,8 @@ public:
 
         m_time += deltaTime;
 
-        // SpaceキーでBloom ON/OFF
-        if (GetKeyDown(VK_SPACE))
+        // SpaceキーでBloom ON/OFF（engine の入力 API を使用。押した瞬間だけトグル）
+        if (WasKeyPressed(VK_SPACE))
         {
             m_bloomEnabled = !m_bloomEnabled;
         }
@@ -201,13 +201,6 @@ private:
         r += m;
         g += m;
         b += m;
-    }
-
-    // キー入力取得（仮実装）
-    bool GetKeyDown(int vkey)
-    {
-        // 実際のApplication.hに実装されているはず
-        return (GetAsyncKeyState(vkey) & 0x8000) != 0;
     }
 };
 

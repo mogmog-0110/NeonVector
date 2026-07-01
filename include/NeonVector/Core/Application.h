@@ -4,6 +4,7 @@
 #include <memory>
 #include <Windows.h>
 #include <d3d12.h>
+#include <NeonVector/Math/Vector2.h>
 
 namespace NeonVector
 {
@@ -95,6 +96,16 @@ namespace NeonVector
          */
         Graphics::RenderTarget* GetCurrentRenderTarget() const;
 
+        // ── 入力 ──
+        /** @brief キーが押されている間 true（VK_ 仮想キーコード） */
+        bool IsKeyDown(int vkey) const { return vkey >= 0 && vkey < 256 && m_keyDown[vkey]; }
+        /** @brief そのフレームで押された瞬間だけ true（トグル等に使う） */
+        bool WasKeyPressed(int vkey) const { return vkey >= 0 && vkey < 256 && m_keyPressed[vkey]; }
+        /** @brief マウス座標（クライアント領域, ピクセル） */
+        Vector2 GetMousePosition() const { return { static_cast<float>(m_mouseX), static_cast<float>(m_mouseY) }; }
+        /** @brief マウスボタン（0=左 1=右 2=中）が押されている間 true */
+        bool IsMouseButtonDown(int button) const { return button >= 0 && button < 3 && m_mouseDown[button]; }
+
     protected:
         ApplicationConfig m_config;
         std::unique_ptr<DX12Context> m_context;
@@ -104,6 +115,12 @@ namespace NeonVector
     private:
         static LRESULT CALLBACK WindowProc(HWND hwnd, UINT msg, WPARAM wParam, LPARAM lParam);
         void ProcessMessages();
+
+        // 入力状態（WindowProc が更新、WasKeyPressed はフレーム毎にリセット）
+        bool m_keyDown[256] = {};
+        bool m_keyPressed[256] = {};
+        int m_mouseX = 0, m_mouseY = 0;
+        bool m_mouseDown[3] = {};
     };
 
 } // namespace NeonVector

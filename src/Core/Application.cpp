@@ -2,6 +2,7 @@
 #include "../DX12Context.h"
 #include <chrono>
 #include <iostream>
+#include <windowsx.h>
 
 namespace NeonVector
 {
@@ -73,6 +74,10 @@ namespace NeonVector
 
         while (m_isRunning)
         {
+            // 入力: 前フレームの「押された瞬間」をクリアしてからメッセージ処理
+            for (int i = 0; i < 256; ++i)
+                m_keyPressed[i] = false;
+
             // メッセージ処理
             ProcessMessages();
 
@@ -174,11 +179,35 @@ namespace NeonVector
                 PostQuitMessage(0);
                 return 0;
             case WM_KEYDOWN:
-                if (wParam == VK_ESCAPE)
+            {
+                int vk = static_cast<int>(wParam);
+                if (vk >= 0 && vk < 256)
                 {
-                    app->Quit();
+                    if (!app->m_keyDown[vk])
+                        app->m_keyPressed[vk] = true;   // 押された瞬間
+                    app->m_keyDown[vk] = true;
                 }
+                if (vk == VK_ESCAPE)
+                    app->Quit();
                 return 0;
+            }
+            case WM_KEYUP:
+            {
+                int vk = static_cast<int>(wParam);
+                if (vk >= 0 && vk < 256)
+                    app->m_keyDown[vk] = false;
+                return 0;
+            }
+            case WM_MOUSEMOVE:
+                app->m_mouseX = GET_X_LPARAM(lParam);
+                app->m_mouseY = GET_Y_LPARAM(lParam);
+                return 0;
+            case WM_LBUTTONDOWN: app->m_mouseDown[0] = true;  return 0;
+            case WM_LBUTTONUP:   app->m_mouseDown[0] = false; return 0;
+            case WM_RBUTTONDOWN: app->m_mouseDown[1] = true;  return 0;
+            case WM_RBUTTONUP:   app->m_mouseDown[1] = false; return 0;
+            case WM_MBUTTONDOWN: app->m_mouseDown[2] = true;  return 0;
+            case WM_MBUTTONUP:   app->m_mouseDown[2] = false; return 0;
             }
         }
 
