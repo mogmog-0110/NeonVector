@@ -1,6 +1,13 @@
 {
   "name": "neonvector",
+  "builtin-baseline": "c0948694cceff995e5cf90b751e0c5a95d613458",
   "dependencies": [
     "directx-headers"
+  ],
+  "overrides": [
+    {
+      "name": "directx-headers",
+      "version": "1.616.0"
+    }
   ]
 }
