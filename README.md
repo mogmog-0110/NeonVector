@@ -5,19 +5,19 @@ Geometry Wars 系の「発光する線と図形」を、`Application` を継承�
 
 ## できること
 
-- **Application フレームワーク** — ウィンドウ生成・メインループ・deltaTime を面倒みる基底クラス。`OnInit / OnUpdate / OnRender` を override するだけ。
-- **入力** — `IsKeyDown / WasKeyPressed`（押した瞬間）・`GetMousePosition / IsMouseButtonDown`。
-- **LineBatcher** — 太さ・色・グロー付きの線をバッチングして高速描画。
-- **Primitives** — 線・円・円弧・矩形・多角形・正多角形・星・グリッド（すべて glow 指定可）。
-- **Trail** — 動く物体の残光（コメット）。新しい端ほど明るく太く。
-- **ParticleSystem** — 放射・減衰・寿命付きの発光パーティクル（速度方向のストリーク）。
-- **BloomEffect** — 輝度抽出 → ガウシアンブラー → 合成のポストプロセスで、線を発光させる。
-- **RenderTarget** — オフスクリーン描画とステート遷移。
+- **Application フレームワーク**。ウィンドウ生成・メインループ・deltaTime を面倒みる基底クラス。`OnInit / OnUpdate / OnRender` を override するだけ。
+- **入力**。`IsKeyDown / WasKeyPressed`（押した瞬間）・`GetMousePosition / IsMouseButtonDown`。
+- **LineBatcher**。太さ・色・グロー付きの線をバッチングして高速描画。
+- **Primitives**。線・円・円弧・矩形・多角形・正多角形・星・グリッド（すべて glow 指定可）。
+- **Trail**。動く物体の残光（コメット）。新しい端ほど明るく太く。
+- **ParticleSystem**。放射・減衰・寿命付きの発光パーティクル（速度方向のストリーク）。
+- **BloomEffect**。輝度抽出 → ガウシアンブラー → 合成のポストプロセスで、線を発光させる。
+- **RenderTarget**。オフスクリーン描画とステート遷移。
 
 ## 必要環境
 
 - Windows 10/11
-- **Visual Studio 2022**（C++20）＋ **Windows SDK 10.0.22621 以降**
+- **Visual Studio 2022**（C++20）＋ Windows SDK 10.0.22621 以降
   （2019 の 10.0.18362 では DirectX-Headers が要求する型が足りずビルドできません）
 - CMake 3.20+、vcpkg
 
