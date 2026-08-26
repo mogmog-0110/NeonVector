@@ -5,14 +5,19 @@ Geometry Wars 系の「発光する線と図形」を、`Application` を継承�
 
 ## できること
 
-- **Application フレームワーク**。ウィンドウ生成・メインループ・deltaTime を面倒みる基底クラス。`OnInit / OnUpdate / OnRender` を override するだけ。
-- **入力**。`IsKeyDown / WasKeyPressed`（押した瞬間）・`GetMousePosition / IsMouseButtonDown`。
-- **LineBatcher**。太さ・色・グロー付きの線をバッチングして高速描画。
-- **Primitives**。線・円・円弧・矩形・多角形・正多角形・星・グリッド（すべて glow 指定可）。
-- **Trail**。動く物体の残光（コメット）。新しい端ほど明るく太く。
-- **ParticleSystem**。放射・減衰・寿命付きの発光パーティクル（速度方向のストリーク）。
-- **BloomEffect**。輝度抽出 → ガウシアンブラー → 合成のポストプロセスで、線を発光させる。
-- **RenderTarget**。オフスクリーン描画とステート遷移。
+`Application` を継承すればもう動く。ウィンドウを作り、メインループを回し、deltaTime を渡すところまでは
+基底クラスが持っている。あとは `OnInit / OnUpdate / OnRender` を override するだけ。入力は
+`IsKeyDown` と `WasKeyPressed`（押した瞬間だけ true）、マウスは `GetMousePosition` と `IsMouseButtonDown`。
+
+描画の中心は `LineBatcher`。太さと色とグローを指定した線をためておいて、まとめて 1 回で流す。
+その上に `Primitives` が乗っていて、線・円・円弧・矩形・多角形・正多角形・星・グリッドが引ける。
+どれも glow を指定できる。
+
+`Trail` は動くものの後ろに残光を引く。新しい端ほど明るく、太い。`ParticleSystem` は放射して
+減衰して消える発光パーティクルで、速度の向きへストリークが伸びる。
+
+線を実際に光らせているのは `BloomEffect`。輝度を抜き、ガウシアンでぼかし、元の絵へ足し戻している。
+そのためのオフスクリーン描画とステート遷移は `RenderTarget` が持つ。
 
 ## 必要環境
 
